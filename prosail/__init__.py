@@ -170,6 +170,8 @@ def leaf(x,theta2=40.):
         x['tau']=(1.0-x['k'][ww])*np.exp(-x['k'][ww])+x['k'][ww]**2*yy
     
     # transmissivity of the layer
+    tau = x['tau']
+    
     theta1=90.
     t1 = tav_abs(theta1,x['n'])
     t2 = tav_abs(theta2,x['n'])
