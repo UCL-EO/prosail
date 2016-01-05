@@ -52,6 +52,25 @@ INTEGER*4 :: na
 data litab/5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89./
 if (.not. allocated(lidf)) ALLOCATE(lidf(13))
 !	Raise all flags if we arrive here for the first time, lower them at other times
+
+if (.not. init_completed) then
+        init_completed = 1
+        ! ANGLE CONVERSION
+        pi=3.151592d0
+        rd=pi/180.d0
+
+        ! PROSPECT output
+        ! SAIL
+        ALLOCATE (sb(nw),sf(nw),vb(nw),vf(nw),w(nw))
+        ALLOCATE (m(nw),m2(nw),att(nw),sigb(nw),rinf(nw))
+        ALLOCATE(tsd(nw),tdd(nw),tdo(nw),rsd(nw),rdd(nw),rso(nw),rdo(nw))
+        ALLOCATE(rddt(nw),rsdt(nw),rdot(nw),rsodt(nw),rsost(nw),rsot(nw),rsos(nw),rsod(nw))
+        ALLOCATE(lidf(13))
+        ! resh : hemispherical reflectance
+        ! resv : directional reflectance
+        ALLOCATE(rsoil_old(nw))
+endif
+
 DO i=1,7
 	flag(i)=.not.init_completed
 ENDDO
