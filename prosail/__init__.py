@@ -124,7 +124,9 @@ def soil(x,scale=None,trans=False):
                 scipy.interpolate.interp1d(cchar[0],cchar[1])(x['lambda'])
         try:
                 result += x['params'][p] * x['spectra'][p]
-        
+        except:
+                pass
+    return result
 
 
 
