@@ -50,7 +50,7 @@ REAL*8 :: e1(nw),e2(nw),rinf2(nw),re(nw),denom(nw)
 REAL*8 :: Ps(nw),Qs(nw),Pv(nw),Qv(nw),dn(nw)
 INTEGER*4 :: na
 data litab/5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89./
-ALLOCATE(lidf(13))
+if (.not. allocated(lidf)) ALLOCATE(lidf(13))
 !	Raise all flags if we arrive here for the first time, lower them at other times
 DO i=1,7
 	flag(i)=.not.init_completed
