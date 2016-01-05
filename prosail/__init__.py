@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.interpolate
 from prosail_fortran import run_sail, run_prosail, prospect_5b
 from prosail_fortran import mod_dataspec_p5b
 
