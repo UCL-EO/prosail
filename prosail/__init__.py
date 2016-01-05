@@ -120,14 +120,14 @@ def soil(x,scale=None,trans=False):
             if p is 'wet':
               x['spectra'][p] = mod_dataspec_p5b.rsoil2
             if p is 'char':
-              cchar = np.array([i.split() for i in charsoil.split(',')]).T
+              cchar = np.array([np.array(i.split()).astype(float) for i in charsoil.split(',')]).T
               x['spectra'][p] = \
                 scipy.interpolate.interp1d(cchar[0],cchar[1])(x['lambda'])
         try:
                 result += x['params'][p] * x['spectra'][p]
         except:
                 pass
-    return result
+    return result,x
 
 
 
