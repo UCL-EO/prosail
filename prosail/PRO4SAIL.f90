@@ -54,7 +54,6 @@ if (.not. allocated(lidf)) ALLOCATE(lidf(13))
 !	Raise all flags if we arrive here for the first time, lower them at other times
 
 if (.not. init_completed) then
-        init_completed = 1
         ! ANGLE CONVERSION
         pi=3.151592d0
         rd=pi/180.d0
