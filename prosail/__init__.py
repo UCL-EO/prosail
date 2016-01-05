@@ -96,7 +96,8 @@ def leaf(x,theta2=40.):
         
     # wavelength
     if not 'lamdba' in x:
-        x['lambda'] = mod_dataspec_p5b.lambda
+        x['lambda'] = eval('mod_dataspec_p5b.lambda')
+        # yuk = bacuase of reserved name 'lambda'
         
     x['nw'] = len(x['lambda'])
     
