@@ -1,4 +1,4 @@
-import numpy as np
+mport numpy as np
 from prosail_fortran import run_sail, run_prosail, prospect_5b
 from prosail_fortran import mod_dataspec_p5b
 
@@ -22,7 +22,7 @@ def trans_prosail ( N, cab, car, cbrown, cw, cm, lai, lidfa, lidfb, rsoil, psoil
     retval = run_prosail ( N, xkab, xkar, cbrown, xkw, xdm, xlai, \
             lidfa, lidfb, rsoil, psoil, hspot, tts, tto, psi, typelidf )
     return retval
-    
+
 # nested stuff
 '''
 tau average
@@ -32,11 +32,11 @@ def tav_abs(theta,refr):
     if theta == 0:
         res=4.*refr/(refr+1.)**2
         return res
-    
+
     refr2=refr*refr
     ax=(refr+1.)**2/2.
     bx=-(refr2-1.)**2/4.
-    
+
     if thetarad == np.pi/2.:
         b1=0.
     else:
@@ -53,14 +53,14 @@ def tav_abs(theta,refr):
     tp5=16.*refr2**3*(1./(2.*(refr2+1.)*b0-((refr2-1.)**2))-1./(2.*(refr2+1.) \
             *ax-(refr2-1.)**2))/(refr2+1.)**3
     tp=tp1+tp2+tp3+tp4+tp5
-    res=(ts+tp)/(2.*sin(thetarad)**2)
-    
+    res=(ts+tp)/(2.*np.sin(thetarad)**2)
+
     return res
 
 '''
 Define leaf absorbing constituents
 '''
-def leaf(x,theta2=40.):
+def leaf(x,theta2=40.,scale=None,trans=False):
     '''
     x is a dictionary
     
@@ -91,51 +91,67 @@ def leaf(x,theta2=40.):
     
     '''
     # number of leaf layers
-    if not 'N' in x:
-        x['N'] = 1.0
-        
+    if not 'n' in x:
+        x['n'] = 1.0
+
     # wavelength
     if not 'lamdba' in x:
-        x['lambda'] = eval('mod_dataspec_p5b.lambda')
-        # yuk = bacuase of reserved name 'lambda'
-        
+        #try:
+        #    x['lambda'] = eval('mod_dataspec_p5b.lambda')
+        #except:
+        x['lambda'] = np.arange(400.,2501.)
+
     x['nw'] = len(x['lambda'])
-    
+
     if not 'params' in x:
         # return zero arrays of correct size if no parameters specified
-        return np.zeros(x['nw']),np.zeros(x['nw'])
-    
-    if not 'spectra' in x: 
+        return np.zeros(x['nw']),np.zeros(x['nw']),x
+
+    if not 'spectra' in x:
         x['spectra'] = {}
-        
+
     # get refractive index
-    if not 'n' in x:
-        x['n'] = mod_dataspec_p5b.refractive
-        
+    if not 'refractive' in x:
+        x['refractive'] = mod_dataspec_p5b.refractive
+
     # load defaults
     for p in x['params']:
         if not p in x['spectra']:
             try:
-                kterm = 'k_' + p[1:]
+                kterm = 'k_c' + p[1:]
                 # potential for security issues using eval? find a
                 # better way to do this
                 x['spectra'][p] = eval('mod_dataspec_p5b'+'.'+kterm)
             except:
                 pass
 
-    x['k'] = np.zeros(mod_dataspec_p5b.nw)
-    x['k'][x['k']<0] = 0.
-    
-    x['tau'] = np.ones(mod_dataspec_p5b.nw)
+    x['k'] = np.zeros(x['nw'])
+    x['tau'] = np.ones(x['nw'])
+
+    # check scaling
+    scale = scale or {'cab':100.,'car':100.,'cw':1/50.,'cm':1/100.}
+    if not 'scale' in x:
+      x['scale'] = {}
+
+    for p in scale.keys():
+      if p in x['params']:
+        x['scale'][p] = scale[p]
+
+
     for p in x['params']:
         if p in x['spectra']:
-            x['k'] += p * x['spectra']
-    x['k'] /= x['N']
-    
+            v = x['params'][p]
+            if trans:
+                # try a transformation
+                if p in x['scale']:
+                    v =  - x['scale'][p] * np.log ( v )
+            x['k'] += v * x['spectra'][p]
+    x['k'] /= x['n']
+
     # upper limit
     ww = np.where(x['k'] >= 85)[0]
     x['tau'][ww] = 0.
-    
+
     # lower limit
     ww = np.where(x['k'] <= 4)[0]
     if len(ww):
@@ -152,7 +168,7 @@ def leaf(x,theta2=40.):
         yy=(yy*xx+8.64664716763387311e-1)*xx+7.42047691268006429e-1
         yy=yy-np.log(x['k'][ww])
         x['tau'][ww] = (1.0-x['k'][ww])*np.exp(-x['k'][ww])+x['k'][ww]**2*yy
-    
+
     ww = np.where((x['k'] > 4) * (x['k'] <= 85))[0]
     if len(ww):
         xx=14.5/(x['k'][ww]+3.25)-1.0
@@ -168,24 +184,24 @@ def leaf(x,theta2=40.):
         yy=((yy*xx-1.06374875116569657e-2)*xx-8.50699154984571871e-2)*xx+\
                 9.23755307807784058e-1
         yy=np.exp(-x['k'][ww])*yy/x['k'][ww]
-        x['tau']=(1.0-x['k'][ww])*np.exp(-x['k'][ww])+x['k'][ww]**2*yy
-    
+        x['tau'][ww]=(1.0-x['k'][ww])*np.exp(-x['k'][ww])+x['k'][ww]**2*yy
+
     # transmissivity of the layer
     tau = x['tau']
-    
+
     theta1=90.
-    t1 = tav_abs(theta1,x['n'])
-    t2 = tav_abs(theta2,x['n'])
+    t1 = tav_abs(theta1,x['refractive'])
+    t2 = tav_abs(theta2,x['refractive'])
+    x['t1'] = t1
+    x['t2'] = t2
     x1=1-t1
-    x2=t1**2*tau**2*(x['n']**2-t1)
-    x3=t1**2*tau*x['n']**2
-    x4=x['n']**4-tau**2*(x['n']**2-t1)**2
+    x2=t1**2*tau**2*(x['refractive']**2-t1)
+    x3=t1**2*tau*x['refractive']**2
+    x4=x['refractive']**4-tau**2*(x['refractive']**2-t1)**2
     x5=t2/t1
     x6=x5*(t1-1)+1-t2
     r=x1+x2/x4
     t=x3/x4
     ra=x5*r+x6
     ta=x5*t
-    return ra,ta
-
-    
+    return ra,ta,x
