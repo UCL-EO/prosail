@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.interpolate
 from prosail_fortran import run_sail, run_prosail, prospect_5b
-from prosail_fortran import mod_dataspec_p5b
+from prosail_fortran import mod_dataspec_p5b,sail, mod_sail
 
 def trans_prosail ( N, cab, car, cbrown, cw, cm, lai, lidfa, lidfb, rsoil, psoil, \
         hspot, tts, tto, psi, typelidf):
