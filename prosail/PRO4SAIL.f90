@@ -1,11 +1,11 @@
 SUBROUTINE SAIL( rho, tau, LIDFa,LIDFb,TypeLIDF,lai,q,tts,tto,psi,rsoil)
 
-	! This version has been implemented by Jean-Baptiste Féret
-	! Jean-Baptiste Féret takes the entire responsibility for this version 
+	! This version has been implemented by Jean-Baptiste FÃ©ret
+	! Jean-Baptiste FÃ©ret takes the entire responsibility for this version 
 	! All comments, changes or questions should be sent to:
 	! jbferet@stanford.edu
 
-!	Jean-Baptiste Féret
+!	Jean-Baptiste FÃ©ret
 !	Institut de Physique du Globe de Paris
 !	Space and Planetary Geophysics
 !	October 2009
@@ -50,7 +50,7 @@ REAL*8 :: e1(nw),e2(nw),rinf2(nw),re(nw),denom(nw)
 REAL*8 :: Ps(nw),Qs(nw),Pv(nw),Qv(nw),dn(nw)
 INTEGER*4 :: na
 data litab/5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89./
-
+ALLOCATE(lidf(13))
 !	Raise all flags if we arrive here for the first time, lower them at other times
 DO i=1,7
 	flag(i)=.not.init_completed
@@ -242,7 +242,7 @@ ENDIF
 IF (flag(6)) THEN
 	!	Treatment of the hotspot-effect
 	alf=1e6
-	!	Apply correction 2/(K+k) suggested by F.-M. Bréon
+	!	Apply correction 2/(K+k) suggested by F.-M. BrÃ©on
 	IF (q.gt.0.) THEN
 		alf=(dso/q)*2./(ks+ko)
 	ENDIF
@@ -318,12 +318,12 @@ END
 
 SUBROUTINE PRO4SAIL(N,Cab,Car,Cbrown,Cw,Cm,LIDFa,LIDFb,TypeLIDF,lai,q,tts,tto,psi,rsoil)
 
-	! This version has been implemented by Jean-Baptiste Féret
-	! Jean-Baptiste Féret takes the entire responsibility for this version 
+	! This version has been implemented by Jean-Baptiste FÃ©ret
+	! Jean-Baptiste FÃ©ret takes the entire responsibility for this version 
 	! All comments, changes or questions should be sent to:
 	! jbferet@stanford.edu
 
-!	Jean-Baptiste Féret
+!	Jean-Baptiste FÃ©ret
 !	Institut de Physique du Globe de Paris
 !	Space and Planetary Geophysics
 !	October 2009
@@ -561,7 +561,7 @@ ENDIF
 IF (flag(6)) THEN
 	!	Treatment of the hotspot-effect
 	alf=1e6
-	!	Apply correction 2/(K+k) suggested by F.-M. Bréon
+	!	Apply correction 2/(K+k) suggested by F.-M. BrÃ©on
 	IF (q.gt.0.) THEN
 		alf=(dso/q)*2./(ks+ko)
 	ENDIF
