@@ -119,7 +119,7 @@ def soil(x,scale=None,trans=False):
             if p is 'wet':
               x['spectra'][p] = mod_dataspec_p5b.rsoil2
             if p is 'char':
-              cchar = np.array([i.split() for i in np.split(charsoil,',')]).T
+              cchar = np.array([i.split() for i in charsoil.split(',')]).T
               x['spectra'][p] = \
                 scipy.interpolate.interp1d(cchar[0],cchar[1])(x['lambda'])
         try:
